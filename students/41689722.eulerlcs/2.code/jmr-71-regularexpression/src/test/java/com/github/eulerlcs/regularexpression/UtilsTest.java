@@ -316,6 +316,17 @@ public class UtilsTest {
 		assertTrue(result3);
 	}
 
+	@Test
+	public void test_foreignFullName() {
+		String text = Utils.readAllFromResouce("foreignFullName.txt");
+
+		Pattern p = Pattern.compile("^[A-Z]+,[A-Z]+$", Pattern.MULTILINE);
+		Matcher m = p.matcher(text);
+		while (m.find()) {
+			System.out.println(m.group());
+		}
+	}
+
 	/**
 	 * Matcher.group的例子：匹配 字母-数字
 	 * 
