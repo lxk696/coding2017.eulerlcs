@@ -3,6 +3,8 @@ package com.github.eulerlcs.regularexpression;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -312,5 +314,78 @@ public class UtilsTest {
 		assertFalse(result1);
 		assertTrue(result2);
 		assertTrue(result3);
+	}
+
+	/**
+	 * Matcher.group的例子：匹配 字母-数字
+	 * 
+	 * <pre>
+	 * group(0):正则表达式的匹配值
+	 * </pre>
+	 */
+	@Test
+	public void test05_00() {
+		Pattern p = Pattern.compile("([a-z]+)-(\\d+)");
+		Matcher m = p.matcher("type x-235, type y-3, type zw-465");
+
+		while (m.find()) {
+			System.out.println(m.group());
+		}
+	}
+
+	/**
+	 * 如何用正则表达式求模板字符串替换前后的键值对<br>
+	 * 
+	 * @see <a href=
+	 *      "https://github.com/onlyliuxin/coding2017/issues/506">https://github.com/onlyliuxin/coding2017/issues/506</a>
+	 */
+	@Test
+	public void testQQQ69671710() {
+		String tmpl = "【工银信用卡】于${startTime}至${endTime}申办奋斗卡，无年费，赢郎平签名排球！详情${link}";
+		String text = "【工银信用卡】于昨天至今天申办奋斗卡，无年费，赢郎平签名排球！详情没有";
+
+		System.out.println("模板字符串：" + tmpl);
+		System.out.println("文本字符串：" + text);
+		System.out.println();
+
+		// 模板字符串中变量的正则表达式
+		String keyRegex = "\\$\\{.*?\\}";
+
+		// 找出模板字符串中变量
+		List<String> keyList = new ArrayList<>();
+		{
+			Pattern p = Pattern.compile(keyRegex);
+			Matcher m = p.matcher(tmpl);
+
+			while (m.find()) {
+				keyList.add(m.group());
+			}
+		}
+
+		// 找出文本字符串中替换值集合
+		List<String> valueList = new ArrayList<>();
+		{
+			// **关键想法** 把模板字符串改装成正则表达式
+			String tmplRegex = "^" + tmpl.replaceAll(keyRegex, "(.*?)") + "$";
+			System.out.println("模板字符串改装后的正则表达式：" + tmplRegex);
+			System.out.println();
+
+			Pattern p = Pattern.compile(tmplRegex);
+			Matcher m = p.matcher(text);
+			if (m.find()) {
+				for (int i = 1; i <= m.groupCount(); i++) {
+					valueList.add(m.group(i));
+				}
+			}
+		}
+
+		// 输出结果
+		if (valueList.isEmpty()) {
+			System.out.println("the text file format is not correct");
+		} else {
+			for (int i = 0; i < keyList.size(); i++) {
+				System.out.println(keyList.get(i) + "\t\t" + valueList.get(i));
+			}
+		}
 	}
 }
